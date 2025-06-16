@@ -2,7 +2,8 @@ require('dotenv').config();
 import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { connectToMongo } from './utils/db';
+import { closeMongoConnection, connectToMongo } from './utils/db';
+import { errorMiddleware } from './middlewares/error';
 
 export const app = express();
 
@@ -29,6 +30,10 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  connectToMongo();
+  try {
+    console.log(`Server is running on port ${PORT}`);
+    connectToMongo();
+  } catch (error) {
+    closeMongoConnection()
+  }
 });
